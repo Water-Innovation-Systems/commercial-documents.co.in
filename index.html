@@ -342,7 +342,7 @@
     .form-options {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       gap: 10px;
       margin: 2px 0 21px;
     }
@@ -590,7 +590,6 @@
             </div>
 
             <div class="form-options" id="loginOptions">
-              <label class="check-label"><input type="checkbox" name="remember"> Keep me signed in</label>
               <button class="text-button" id="forgotButton" type="button">Forgot password?</button>
             </div>
 
@@ -604,7 +603,7 @@
             </button>
           </form>
 
-          <p class="auth-footnote">A secure workspace for the documents your business depends on.</p>
+          <p class="auth-footnote">Demo accounts are saved in this browser and are not secure authentication.</p>
         </div>
 
         <div id="resetView" hidden>
@@ -630,7 +629,7 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"></path></svg>
             </button>
           </form>
-          <p class="auth-footnote">Password reset requires an email delivery service to be configured.</p>
+          <p class="auth-footnote">Browser-only accounts cannot receive password-reset emails.</p>
         </div>
       </div>
     </section>
