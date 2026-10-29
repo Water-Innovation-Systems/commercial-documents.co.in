@@ -99,13 +99,30 @@
     button.querySelector("span").textContent = isBusy ? "Please wait..." : idleText;
   }
 
-  function getRequestError(status) {
-    if (status === 400 || status === 422) return "Check the information you entered and try again.";
+  function getRequestError(status, code) {
+    const errors = {
+      invalid_request: "Check your details. Passwords must contain at least 8 characters, and all required fields must be completed.",
+      invalid_credentials: "We couldn't sign you in with those details. Check your email and password.",
+      account_exists: "An account with that email already exists. Sign in with your existing account.",
+      too_many_attempts: "There have been too many attempts. Wait 15 minutes before trying again.",
+      password_reset_not_configured: "Password reset is unavailable because email delivery has not been configured.",
+      not_found: "The authentication service is not configured at this address. Start the portal using auth_server.py.",
+      method_not_allowed: "This account request is not supported.",
+      unsupported_media_type: "The authentication service received an unsupported request.",
+      payload_too_large: "The form contains too much information. Check the fields and try again.",
+      account_service_error: "The account service encountered an error. Check the server logs and try again."
+    };
+
+    if (typeof code === "string" && Object.hasOwn(errors, code)) return errors[code];
+    if (status === 404 || status === 405) return "The authentication service is not configured at this address. Start the portal using auth_server.py.";
+    if (status === 400 || status === 413 || status === 415 || status === 422) return "Check your details and try again.";
     if (status === 401) return "We couldn't sign you in with those details. Check your email and password.";
-    if (status === 409) return "An account with that email already exists. Try signing in instead.";
-    if (status === 429) return "Too many attempts. Please wait a moment before trying again.";
-    if (status >= 500) return "The account service is temporarily unavailable. Please try again later.";
-    return "Your request couldn't be completed. Please try again.";
+    if (status === 403) return "This account request was rejected. Reload the page and try again.";
+    if (status === 409) return "An account with that email already exists. Sign in with your existing account.";
+    if (status === 429) return "There have been too many attempts. Wait 15 minutes before trying again.";
+    if (status === 503) return "This account service is temporarily unavailable. Please try again later.";
+    if (status >= 500) return "The account service encountered an error. Check the server logs and try again.";
+    return "The account request could not be completed. Please try again.";
   }
 
   async function sendRequest(path, payload) {
@@ -133,19 +150,22 @@
         body: JSON.stringify(payload)
       });
 
-      if (!response.ok) {
-        throw new Error(getRequestError(response.status));
-      }
-
       let result;
       try {
         result = await response.json();
       } catch {
+        if (!response.ok) {
+          throw new Error(getRequestError(response.status));
+        }
         throw new Error("The account service returned an invalid response. Please try again later.");
       }
 
       if (!result || typeof result !== "object" || Array.isArray(result)) {
         throw new Error("The account service returned an invalid response. Please try again later.");
+      }
+
+      if (!response.ok) {
+        throw new Error(getRequestError(response.status, result.error));
       }
 
       return result;
