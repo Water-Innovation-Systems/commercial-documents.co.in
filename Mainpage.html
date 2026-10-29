@@ -793,9 +793,9 @@
             <input id="documentSearch" type="search" placeholder="Find a document..." aria-label="Search document menus" autocomplete="off">
             <span class="search-hint" aria-hidden="true">/</span>
           </label>
-          <a class="account-button" href="index.html" title="Go to sign-in page">
-            <svg class="icon" aria-hidden="true"><use href="#icon-user"></use></svg><span>Account</span>
-          </a>
+          <button class="account-button" id="logoutButton" type="button" title="Sign out of this browser session">
+            <svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5m5 5H3m9-9h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7"/></svg><span>Log out</span>
+          </button>
         </div>
       </header>
 
@@ -1363,5 +1363,6 @@
       initialize();
     })();
   </script>
+  <script src="login.js"></script>
 </body>
 </html>
