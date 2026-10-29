@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Water Innovation Systems - Purchase Order</title>
+<style>
+  :root {
+    color-scheme:light;
+    --ink:#17212b;
+    --blue:#0877bd;
+    --line:#1b2228;
+    --muted:#64717d;
+  }
+  * { box-sizing:border-box; }
+  body {
+    margin:0;
+    padding:24px;
+    background:#edf1f4;
+    color:var(--ink);
+    font-family:Arial, Helvetica, sans-serif;
+  }
+  .toolbar {
+    max-width:800px;
+    margin:0 auto 16px;
+    display:flex;
+    gap:10px;
+    justify-content:flex-end;
+    flex-wrap:wrap;
+  }
+  button {
+    border:0;
+    border-radius:6px;
+    padding:10px 15px;
+    cursor:pointer;
+    background:var(--blue);
+    color:#fff;
+    font:700 13px Arial, Helvetica, sans-serif;
+    box-shadow:0 2px 5px #0b31501a;
+    transition:background .15s ease, transform .15s ease;
+  }
+  button:hover { background:#075f98; transform:translateY(-1px); }
+  button:focus-visible { outline:3px solid #87c9f3; outline-offset:2px; }
+  button.secondary { background:#44515d; }
+  button.secondary:hover { background:#303c47; }
+  .sheet {
+    width:210mm;
+    min-height:297mm;
+    margin:0 auto;
+    padding:18mm 17mm;
+    background:#fff;
+    box-shadow:0 8px 30px #152b3b20;
+  }
+  .po-title {
+    margin:0 0 7mm;
+    text-align:center;
+    color:#162c3c;
+    font-size:10pt;
+    font-weight:700;
+    letter-spacing:.04em;
+  }
+  table { width:100%; border-collapse:collapse; table-layout:fixed; }
+  td, th {
+    border:1px solid var(--line);
+    padding:3px 4px;
+    vertical-align:middle;
+  }
+  .top td { height:15px; font-size:6.3pt; }
+  .brand-cell { width:62%; vertical-align:top; }
+  .right-cell { width:38%; padding:0; }
+  .brand-logo { display:block; width:145px; max-width:100%; height:auto; margin:0 0 5px; }
+  .company-details { font-size:6.1pt; line-height:1.35; }
+  .company-details input {
+    width:65%;
+    min-width:0;
+    border:0;
+    border-bottom:1px dotted #aab4bd;
+    padding:0;
+    color:inherit;
+    font:inherit;
+    background:transparent;
+  }
+  .company-details .client-input { width:75%; }
+  .field-row { display:grid; grid-template-columns:43% 57%; min-height:25px; }
+  .field-row + .field-row { border-top:1px solid var(--line); }
+  .field-label { padding:4px; border-right:1px solid var(--line); font-size:6.3pt; }
+  .field-value { min-width:0; padding:2px 3px; }
+  .field-value input, .field-value textarea {
+    width:100%;
+    min-width:0;
+    border:0;
+    padding:1px;
+    outline:0;
+    color:inherit;
+    background:transparent;
+    font:inherit;
+    font-size:7pt;
+    resize:vertical;
+  }
+  .field-value textarea { min-height:16px; }
+  .meta { margin-top:-1px; }
+  .meta td { height:19px; font-size:6.3pt; }
+  .meta .label { width:14%; }
+  .meta .entry { width:36%; }
+  .meta input {
+    width:100%;
+    min-width:0;
+    border:0;
+    padding:1px;
+    outline:0;
+    color:inherit;
+    background:transparent;
+    font:inherit;
+    font-size:7pt;
+  }
+  .meta textarea {
+    display:block;
+    width:100%;
+    min-width:0;
+    min-height:30px;
+    border:0;
+    padding:2px;
+    outline:0;
+    color:inherit;
+    background:transparent;
+    font:inherit;
+    font-size:7pt;
+    resize:vertical;
+  }
+  .meta .address-row td { height:36px; }
+  .items { margin-top:-1px; }
+  .items th { height:22px; text-align:center; font-size:7pt; }
+  .items td { height:25px; padding:2px 4px; font-size:7pt; }
+  .items input {
+    display:block;
+    width:100%;
+    min-width:0;
+    height:19px;
+    border:0;
+    padding:0;
+    outline:0;
+    color:inherit;
+    background:transparent;
+    font:inherit;
+    font-size:7pt;
+  }
+  .items .num { text-align:center; }
+  .items .qty, .items .rate, .items .amount { text-align:right; }
+  .items .amount { color:#263746; font-weight:700; }
+  .total-label, .total-value { text-align:right; font-size:7pt; font-weight:700; }
+  .words-row td { height:25px; font-size:7pt; }
+  .words-row input {
+    width:100%;
+    border:0;
+    padding:1px;
+    outline:0;
+    color:inherit;
+    background:transparent;
+    font:inherit;
+    font-size:7pt;
+  }
+  .signature { height:43px; vertical-align:bottom; }
+  .signature .sign-text { padding:5px 2px; text-align:right; font-size:6.6pt; line-height:1.45; }
+  .jurisdiction { height:19px; text-align:center; font-size:6.5pt; font-weight:700; }
+  input:focus, textarea:focus { background:#fff9db; }
+  input::placeholder, textarea::placeholder { color:#9aa5ae; opacity:1; }
+  .hint { max-width:800px; margin:12px auto 0; color:var(--muted); font-size:12px; line-height:1.5; }
+  @page { size:A4; margin:0; }
+  @media print {
+    body { margin:0; padding:0; background:#fff; }
+    .toolbar, .hint { display:none !important; }
+    .sheet { width:210mm; min-height:297mm; margin:0; padding:18mm 17mm; box-shadow:none; }
+    input:focus, textarea:focus { background:transparent; }
+    input::placeholder, textarea::placeholder { color:transparent; }
+  }
+  @media (max-width:800px) {
+    body { padding:10px; }
+    .sheet { width:100%; min-height:0; padding:28px 20px; overflow-x:auto; }
+    .po-title { margin-bottom:24px; }
+  }
+  @media (max-width:520px) {
+    body { padding:8px; }
+    .toolbar { justify-content:center; }
+    button { padding:9px 11px; font-size:12px; }
+    .sheet { min-width:620px; padding:24px 18px; }
+  }
+
+</style>
+
+
+</head>
+<body>
+<div class="toolbar">
+  <button type="button" onclick="addItem()">+ Add Item Row</button>
+  <button type="button" class="secondary" onclick="clearForm()">Clear Form</button>
+  <button type="button" onclick="window.print()">Print / Save as PDF</button>
+</div>
+
+<main class="sheet">
+  <h1 class="po-title">Purchase Order</h1>
+  <table class="top">
+    <tr>
+      <td class="brand-cell" rowspan="5">
+        <img class="brand-logo" src="water-innovation-systems-logo.png" alt="Water Innovation Systems">
+          MAHADEVA ARCADE <br>
+          3rd FLOOR, BEST COUNTY, BENGALURU<br>
+          HESARGHATTA MAIN ROAD,<br>
+          VIDYARANYAPURA POST,<br>
+          BANGALORE - 560097<br>
+          Tel: 080-XXXXXXX / Mob: 9900XXXXXX<br>
+          Email: sales@waterinnovation.co.in<br>
+          GSTIN: <input aria-label="Company GSTIN" placeholder="Company GSTIN"><br>
+          PAN: <input aria-label="Company PAN" placeholder="Company PAN"><br>
+        </div>
+      </td>
+      <td class="right-cell">
+        <div class="field-row"><div class="field-label">PO No. :</div><div class="field-value"><input placeholder="Enter PO number"></div></div>
+        <div class="field-row"><div class="field-label">W.O. :</div><div class="field-value"><input placeholder="Work order"></div></div>
+      </td>
+    </tr>
+    <tr><td class="right-cell"><div class="field-row"><div class="field-label">Dated :</div><div class="field-value"><input type="date" aria-label="PO date"></div></div></td></tr>
+    <tr><td class="right-cell"><div class="field-row"><div class="field-label">Terms of Payment :</div><div class="field-value"><input placeholder="Payment terms"></div></div></td></tr>
+    <tr><td class="right-cell"><div class="field-row"><div class="field-label">Supplier<br>Reference :</div><div class="field-value"><textarea placeholder="Supplier reference"></textarea></div></div></td></tr>
+    <tr><td class="right-cell"><div class="field-row"><div class="field-label">Project ID : / Stock</div><div class="field-value"><input placeholder="Project ID / Stock"></div></div></td></tr>
+  </table>
+
+  <table class="meta">
+    <colgroup><col style="width:14%"><col style="width:36%"><col style="width:14%"><col style="width:36%"></colgroup>
+    <tr>
+      <td class="label">Client :</td><td class="entry"><input aria-label="Client name" placeholder="Enter client name"></td>
+      <td class="label">Mode of Dispatch :</td><td class="entry"><input placeholder="Dispatch mode"></td>
+    </tr>
+    <tr class="address-row">
+      <td>Address :</td><td><textarea aria-label="Client address" placeholder="Enter client address"></textarea></td>
+      <td>Delivery Date :</td><td><input type="date" aria-label="Delivery date"></td>
+    </tr>
+    <tr>
+      <td>Email :</td><td><input type="email" aria-label="Client email" placeholder="Enter client email"></td>
+      <td>Packing &amp;<br>Forwarding :</td><td><input placeholder="e.g. 5%"></td>
+    </tr>
+    <tr>
+      <td>Website :</td><td><input aria-label="Client website" placeholder="Enter client website"></td>
+      <td>IGST :</td><td><input placeholder="e.g. 18%"></td>
+    </tr>
+    <tr>
+      <td>GSTIN :</td><td><input aria-label="Client GSTIN" placeholder="Enter client GSTIN"></td>
+      <td>Freight :</td><td><input placeholder="Freight charges"></td>
+    </tr>
+  </table>
+
+  <table class="items" id="itemsTable">
+    <colgroup>
+      <col style="width:9%"><col style="width:35%"><col style="width:13%">
+      <col style="width:9%"><col style="width:17%"><col style="width:17%">
+    </colgroup>
+    <thead>
+      <tr><th>Sl.No</th><th>Description</th><th>Part No.</th><th>Qty</th><th>Rate (Rs.)</th><th>Amount (Rs.)</th></tr>
+    </thead>
+    <tbody id="itemRows">
+      <tr>
+        <td class="num">1</td>
+        <td><input aria-label="Item 1 description"></td>
+        <td><input aria-label="Item 1 part number"></td>
+        <td><input class="qty" type="number" min="0" step="any" aria-label="Item 1 quantity" oninput="calculateTotals()"></td>
+        <td><input class="rate" type="number" min="0" step="any" aria-label="Item 1 rate" oninput="calculateTotals()"></td>
+        <td><input class="amount" readonly aria-label="Item 1 amount"></td>
+      </tr>
+      <tr>
+        <td class="num">2</td>
+        <td><input aria-label="Item 2 description"></td>
+        <td><input aria-label="Item 2 part number"></td>
+        <td><input class="qty" type="number" min="0" step="any" aria-label="Item 2 quantity" oninput="calculateTotals()"></td>
+        <td><input class="rate" type="number" min="0" step="any" aria-label="Item 2 rate" oninput="calculateTotals()"></td>
+        <td><input class="amount" readonly aria-label="Item 2 amount"></td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr><td colspan="4" style="border-right:0;border-bottom:0"></td><td class="total-label">TOTAL AMOUNT</td><td class="total-value"><span id="totalAmount">0.00</span></td></tr>
+    </tfoot>
+  </table>
+
+  <table>
+    <tr class="words-row"><td style="width:22%;font-weight:700">Total Amount in Words:</td><td><input id="amountWords" placeholder="Enter total amount in words"></td></tr>
+    <tr><td colspan="2" class="signature"><div class="sign-text">For Water Innovation Systems<br><br>Authorized Signatory</div></td></tr>
+    <tr><td colspan="2" class="jurisdiction">In Case of Dispute-Bangalore Jurisdiction Only</td></tr>
+  </table>
+</main>
+<p class="hint">Tip: Fill in the blank fields, add more item rows if needed, then choose “Print / Save as PDF”. The company contact/address text can be edited in the HTML to match your official details.</p>
+
+<script>
+function calculateTotals() {
+  let total = 0;
+  document.querySelectorAll('#itemRows tr').forEach(row => {
+    const qty = parseFloat(row.querySelector('.qty')?.value) || 0;
+    const rate = parseFloat(row.querySelector('.rate')?.value) || 0;
+    const amount = qty * rate;
+    const amountInput = row.querySelector('.amount');
+    if (amountInput) amountInput.value = (qty || rate) ? amount.toFixed(2) : '';
+    total += amount;
+  });
+  document.getElementById('totalAmount').textContent = total.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function addItem() {
+  const tbody = document.getElementById('itemRows');
+  const n = tbody.rows.length + 1;
+  const row = tbody.insertRow();
+  row.innerHTML = `
+    <td class="num">${n}</td>
+    <td><input aria-label="Item ${n} description"></td>
+    <td><input aria-label="Item ${n} part number"></td>
+    <td><input class="qty" type="number" min="0" step="any" aria-label="Item ${n} quantity" oninput="calculateTotals()"></td>
+    <td><input class="rate" type="number" min="0" step="any" aria-label="Item ${n} rate" oninput="calculateTotals()"></td>
+    <td><input class="amount" readonly aria-label="Item ${n} amount"></td>`;
+}
+function clearForm() {
+  if (!confirm('Clear all entered purchase order details?')) return;
+  document.querySelectorAll('input, textarea').forEach(el => {
+    if (el.type === 'button' || el.readOnly) return;
+    if (el.type === 'date' || el.type === 'number') el.value = '';
+    else el.value = '';
+  });
+  document.getElementById('totalAmount').textContent = '0.00';
+  const tbody = document.getElementById('itemRows');
+  while (tbody.rows.length > 2) tbody.deleteRow(-1);
+  tbody.querySelectorAll('.amount').forEach(el => el.value = '');
+}
+</script>
+</body>
+</html>
