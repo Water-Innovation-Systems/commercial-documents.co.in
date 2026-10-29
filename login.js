@@ -1,15 +1,24 @@
 (() => {
   "use strict";
 
-  const API = {
-    login: "/api/auth/login",
-    signup: "/api/auth/signup",
-    passwordReset: "/api/auth/password-reset"
-  };
+  const ACCOUNTS_KEY = "wisi.portal.accounts.v1";
+  const PASSWORD_ITERATIONS = 210000;
+  const PASSWORD_SCHEME = "PBKDF2-SHA-256";
   const DASHBOARD_URL = "Mainpage.html";
 
+  const logoutButton = document.getElementById("logoutButton");
+  if (logoutButton) {
+    logoutButton.addEventListener("click", () => {
+      window.location.assign("index.html");
+    });
+  }
+
   const accountForm = document.getElementById("accountForm");
+  if (!accountForm) return;
+
   const resetForm = document.getElementById("resetForm");
+  if (!resetForm) return;
+
   const accountView = document.getElementById("accountView");
   const resetView = document.getElementById("resetView");
   const accountMessage = document.getElementById("accountMessage");
@@ -18,9 +27,12 @@
   const signupTab = document.getElementById("signupTab");
   const emailInput = document.getElementById("email");
   const passwordInput = document.getElementById("password");
+  const confirmPasswordInput = document.getElementById("confirmPassword");
   const accountSubmit = document.getElementById("submitButton");
   const accountSubmitText = document.getElementById("submitText");
   const resetSubmit = resetForm.querySelector('button[type="submit"]');
+  const resetSubmitText = resetSubmit.querySelector("span");
+  const defaultResetButtonText = resetSubmitText.textContent;
   const modeFields = {
     name: document.getElementById("nameField"),
     company: document.getElementById("companyField"),
@@ -29,7 +41,6 @@
     terms: document.getElementById("termsField"),
     strength: document.getElementById("passwordStrength")
   };
-  const defaultResetButtonText = resetSubmit.querySelector("span").textContent;
   let mode = "login";
 
   function showMessage(element, message, isError) {
@@ -65,7 +76,7 @@
     accountSubmitText.textContent = isSignup ? "Create your account" : "Sign in to your workspace";
     document.getElementById("fullName").required = isSignup;
     document.getElementById("company").required = isSignup;
-    document.getElementById("confirmPassword").required = isSignup;
+    confirmPasswordInput.required = isSignup;
     document.getElementById("acceptTerms").required = isSignup;
     passwordInput.autocomplete = isSignup ? "new-password" : "current-password";
     passwordInput.minLength = isSignup ? 8 : 0;
@@ -86,100 +97,113 @@
       { label: "Good password", color: "#63a878" },
       { label: "Strong password", color: "#168778" }
     ];
+    const bar = document.getElementById("strengthBar");
 
-    document.getElementById("strengthBar").style.width = value ? `${Math.max(14, score * 25)}%` : "0";
-    document.getElementById("strengthBar").style.background = levels[score].color;
+    bar.style.width = value ? `${Math.max(14, score * 25)}%` : "0";
+    bar.style.background = levels[score].color;
     document.getElementById("strengthLabel").textContent = value ? levels[score].label : "";
     modeFields.strength.classList.toggle("is-visible", mode === "signup" && value.length > 0);
   }
 
-  function setBusy(button, isBusy, idleText) {
+  function getWebCrypto() {
+    if (!window.isSecureContext || !window.crypto?.subtle) {
+      throw new Error("Open this site over HTTPS (or localhost) in a modern browser to create and check passwords.");
+    }
+    return window.crypto;
+  }
+
+  function getAccountRecords() {
+    let storedRecords;
+    try {
+      storedRecords = window.localStorage.getItem(ACCOUNTS_KEY);
+    } catch {
+      throw new Error("This browser does not allow access to local storage. Enable it and try again.");
+    }
+
+    if (storedRecords === null) return [];
+
+    let records;
+    try {
+      records = JSON.parse(storedRecords);
+    } catch {
+      throw new Error("Saved account records are damaged. Do not clear them automatically; contact your portal administrator.");
+    }
+
+    if (!Array.isArray(records) || records.some((account) =>
+      !account ||
+      typeof account.email !== "string" ||
+      typeof account.name !== "string" ||
+      typeof account.company !== "string" ||
+      account.passwordScheme !== PASSWORD_SCHEME ||
+      !Number.isInteger(account.passwordIterations) ||
+      typeof account.salt !== "string" ||
+      typeof account.passwordHash !== "string"
+    )) {
+      throw new Error("Saved account records have an unsupported format. Contact your portal administrator.");
+    }
+
+    return records;
+  }
+
+  function saveAccountRecords(records) {
+    try {
+      window.localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(records));
+    } catch {
+      throw new Error("This browser could not save the account. Check available storage and browser privacy settings.");
+    }
+  }
+
+  function bytesToHex(bytes) {
+    return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+  }
+
+  function hexToBytes(hex) {
+    if (hex.length % 2 !== 0 || !/^[\da-f]+$/i.test(hex)) {
+      throw new Error("This saved account has an invalid password record. Contact your portal administrator.");
+    }
+
+    const bytes = new Uint8Array(hex.length / 2);
+    for (let index = 0; index < bytes.length; index++) {
+      bytes[index] = Number.parseInt(hex.slice(index * 2, index * 2 + 2), 16);
+    }
+    return bytes;
+  }
+
+  async function createPasswordHash(password, salt) {
+    const crypto = getWebCrypto();
+    const key = await crypto.subtle.importKey(
+      "raw",
+      new TextEncoder().encode(password),
+      "PBKDF2",
+      false,
+      ["deriveBits"]
+    );
+    const derivedBits = await crypto.subtle.deriveBits(
+      {
+        name: "PBKDF2",
+        salt,
+        iterations: PASSWORD_ITERATIONS,
+        hash: "SHA-256"
+      },
+      key,
+      256
+    );
+    return bytesToHex(new Uint8Array(derivedBits));
+  }
+
+  function hashesMatch(first, second) {
+    if (first.length !== second.length) return false;
+    let difference = 0;
+    for (let index = 0; index < first.length; index++) {
+      difference |= first.charCodeAt(index) ^ second.charCodeAt(index);
+    }
+    return difference === 0;
+  }
+
+  function setBusy(button, label, isBusy, idleText) {
     button.disabled = isBusy;
     button.setAttribute("aria-busy", String(isBusy));
-    button.querySelector("span").textContent = isBusy ? "Please wait..." : idleText;
-  }
-
-  function getRequestError(status, code) {
-    const errors = {
-      invalid_request: "Check your details. Passwords must contain at least 8 characters, and all required fields must be completed.",
-      invalid_credentials: "We couldn't sign you in with those details. Check your email and password.",
-      account_exists: "An account with that email already exists. Sign in with your existing account.",
-      too_many_attempts: "There have been too many attempts. Wait 15 minutes before trying again.",
-      password_reset_not_configured: "Password reset is unavailable because email delivery has not been configured.",
-      not_found: "The authentication service is not configured at this address. Start the portal using auth_server.py.",
-      method_not_allowed: "This account request is not supported.",
-      unsupported_media_type: "The authentication service received an unsupported request.",
-      payload_too_large: "The form contains too much information. Check the fields and try again.",
-      account_service_error: "The account service encountered an error. Check the server logs and try again."
-    };
-
-    if (typeof code === "string" && Object.hasOwn(errors, code)) return errors[code];
-    if (status === 404 || status === 405) return "The authentication service is not configured at this address. Start the portal using auth_server.py.";
-    if (status === 400 || status === 413 || status === 415 || status === 422) return "Check your details and try again.";
-    if (status === 401) return "We couldn't sign you in with those details. Check your email and password.";
-    if (status === 403) return "This account request was rejected. Reload the page and try again.";
-    if (status === 409) return "An account with that email already exists. Sign in with your existing account.";
-    if (status === 429) return "There have been too many attempts. Wait 15 minutes before trying again.";
-    if (status === 503) return "This account service is temporarily unavailable. Please try again later.";
-    if (status >= 500) return "The account service encountered an error. Check the server logs and try again.";
-    return "The account request could not be completed. Please try again.";
-  }
-
-  async function sendRequest(path, payload) {
-    if (window.location.protocol === "file:") {
-      throw new Error("Open this page through your website or a local web server. Sign-in cannot work from a file:// page.");
-    }
-
-    if (window.location.protocol !== "https:" &&
-        window.location.hostname !== "localhost" &&
-        window.location.hostname !== "127.0.0.1") {
-      throw new Error("Sign-in requires a secure HTTPS connection.");
-    }
-
-    const controller = new AbortController();
-    const timeoutId = window.setTimeout(() => controller.abort(), 15000);
-
-    try {
-      const response = await fetch(path, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        credentials: "same-origin",
-        cache: "no-store",
-        redirect: "error",
-        signal: controller.signal,
-        body: JSON.stringify(payload)
-      });
-
-      let result;
-      try {
-        result = await response.json();
-      } catch {
-        if (!response.ok) {
-          throw new Error(getRequestError(response.status));
-        }
-        throw new Error("The account service returned an invalid response. Please try again later.");
-      }
-
-      if (!result || typeof result !== "object" || Array.isArray(result)) {
-        throw new Error("The account service returned an invalid response. Please try again later.");
-      }
-
-      if (!response.ok) {
-        throw new Error(getRequestError(response.status, result.error));
-      }
-
-      return result;
-    } catch (error) {
-      if (error instanceof Error && error.name === "AbortError") {
-        throw new Error("The account service took too long to respond. Please try again.");
-      }
-      if (error instanceof TypeError) {
-        throw new Error("Couldn't reach the account service. Check your connection and try again.");
-      }
-      throw error;
-    } finally {
-      window.clearTimeout(timeoutId);
-    }
+    label.textContent = isBusy ? "Please wait..." : idleText;
   }
 
   function showAccountError(error) {
@@ -234,100 +258,124 @@
   accountForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     clearMessage(accountMessage);
-
     if (!accountForm.reportValidity()) return;
 
     const email = emailInput.value.trim().toLowerCase();
     const password = passwordInput.value;
     const isSignup = mode === "signup";
-    const confirmPassword = document.getElementById("confirmPassword");
+    const confirmInput = confirmPasswordInput;
 
-    if (isSignup && password !== confirmPassword.value) {
+    if (isSignup) {
+      const name = document.getElementById("fullName").value.trim();
+      const company = document.getElementById("company").value.trim();
+      if (name.length < 2 || name.length > 120 || !company || company.length > 160) {
+        showMessage(accountMessage, "Enter a full name (2–120 characters) and a company name (up to 160 characters).", true);
+        document.getElementById(name.length < 2 || name.length > 120 ? "fullName" : "company").focus();
+        return;
+      }
+      if (email.length > 254 || password.length > 128) {
+        showMessage(accountMessage, "The email or password is longer than allowed. Please shorten it and try again.", true);
+        return;
+      }
+    }
+
+    if (isSignup && password !== confirmInput.value) {
       showMessage(accountMessage, "Those passwords don’t match. Please check and try again.", true);
-      confirmPassword.focus();
+      confirmInput.focus();
       return;
     }
 
-    const payload = isSignup
-      ? {
-          name: document.getElementById("fullName").value.trim(),
-          company: document.getElementById("company").value.trim(),
-          email,
-          password,
-          acceptTerms: document.getElementById("acceptTerms").checked
-        }
-      : {
-          email,
-          password,
-          remember: accountForm.elements.remember.checked
-        };
-
     const idleText = isSignup ? "Create your account" : "Sign in to your workspace";
-    setBusy(accountSubmit, true, idleText);
+    setBusy(accountSubmit, accountSubmitText, true, idleText);
 
     try {
-      const result = await sendRequest(isSignup ? API.signup : API.login, payload);
+      const accounts = getAccountRecords();
 
       if (isSignup) {
-        if (result.authenticated === true) {
-          window.location.assign(DASHBOARD_URL);
-          return;
+        const name = document.getElementById("fullName").value.trim();
+        const company = document.getElementById("company").value.trim();
+
+        if (accounts.some((account) => account.email === email)) {
+          throw new Error("An account with that email already exists. Switch to Sign in instead.");
         }
 
-        if (result.created !== true) {
-          throw new Error("The account service couldn't confirm account creation. Please try again.");
-        }
+        const salt = getWebCrypto().getRandomValues(new Uint8Array(16));
+        const passwordHash = await createPasswordHash(password, salt);
+        const account = {
+          name,
+          company,
+          email,
+          passwordScheme: PASSWORD_SCHEME,
+          passwordIterations: PASSWORD_ITERATIONS,
+          salt: bytesToHex(salt),
+          passwordHash,
+          createdAt: new Date().toISOString()
+        };
 
+        saveAccountRecords(accounts.concat(account));
         accountForm.reset();
         setMode("login");
         emailInput.value = email;
-        showMessage(accountMessage, "Your account was created. Sign in with your new credentials.", false);
+        showMessage(accountMessage, "Your account has been created. Sign in with your new credentials.", false);
         emailInput.focus();
         return;
       }
 
-      if (result.authenticated !== true) {
-        throw new Error("We couldn't verify your sign-in. Please check your details and try again.");
+      const account = accounts.find((record) => record.email === email);
+      if (!account) {
+        throw new Error("No saved account was found for this email in this browser. Create an account first.");
+      }
+      if (password.length > 128 ||
+          account.passwordIterations < 100000 ||
+          account.passwordIterations > PASSWORD_ITERATIONS) {
+        throw new Error("This account's saved password record is invalid. Create a new account and try again.");
+      }
+
+      const crypto = getWebCrypto();
+      const key = await crypto.subtle.importKey(
+        "raw",
+        new TextEncoder().encode(password),
+        "PBKDF2",
+        false,
+        ["deriveBits"]
+      );
+      const derivedBits = await crypto.subtle.deriveBits(
+        {
+          name: "PBKDF2",
+          salt: hexToBytes(account.salt),
+          iterations: account.passwordIterations,
+          hash: "SHA-256"
+        },
+        key,
+        256
+      );
+
+      if (!hashesMatch(bytesToHex(new Uint8Array(derivedBits)), account.passwordHash)) {
+        throw new Error("The password is incorrect. Check it and try again.");
       }
 
       window.location.assign(DASHBOARD_URL);
     } catch (error) {
       showAccountError(error);
     } finally {
-      setBusy(accountSubmit, false, mode === "signup" ? "Create your account" : "Sign in to your workspace");
+      setBusy(
+        accountSubmit,
+        accountSubmitText,
+        false,
+        mode === "signup" ? "Create your account" : "Sign in to your workspace"
+      );
     }
   });
 
-  resetForm.addEventListener("submit", async (event) => {
+  resetForm.addEventListener("submit", (event) => {
     event.preventDefault();
     clearMessage(resetMessage);
     if (!resetForm.reportValidity()) return;
 
-    const resetEmail = document.getElementById("resetEmail");
-    setBusy(resetSubmit, true, defaultResetButtonText);
-
-    try {
-      const result = await sendRequest(API.passwordReset, {
-        email: resetEmail.value.trim().toLowerCase()
-      });
-
-      if (result.accepted !== true) {
-        throw new Error("The account service couldn't accept this request. Please try again later.");
-      }
-
-      showMessage(
-        resetMessage,
-        "If an account matches that email, password-reset instructions will be sent.",
-        false
-      );
-    } catch (error) {
-      showMessage(
-        resetMessage,
-        error instanceof Error ? error.message : "Something went wrong. Please try again.",
-        true
-      );
-    } finally {
-      setBusy(resetSubmit, false, defaultResetButtonText);
-    }
+    showMessage(
+      resetMessage,
+      "Password reset by email is not available for browser-only accounts. Create a new account in this browser or contact your portal administrator.",
+      true
+    );
   });
 })();
