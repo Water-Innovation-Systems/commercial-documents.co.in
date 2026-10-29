@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="Editable, print-ready Water Innovation Systems quotation template.">
+  <title>Quotation | Water Innovation Systems</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #171717;
+      --muted: #565656;
+      --blue: #1576bd;
+      --line: #202020;
+      font-family: "Times New Roman", Times, serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 22px;
+      color: var(--ink);
+      background: #e9edf0;
+      font-family: "Times New Roman", Times, serif;
+      font-size: 10pt;
+    }
+
+    button, input, textarea { font: inherit; }
+
+    .toolbar {
+      display: flex;
+      width: 210mm;
+      max-width: 100%;
+      justify-content: flex-end;
+      gap: 9px;
+      margin: 0 auto 14px;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    .toolbar button {
+      border: 0;
+      border-radius: 6px;
+      padding: 10px 15px;
+      color: #fff;
+      background: #087c78;
+      font: 600 13px "Segoe UI", Arial, sans-serif;
+      cursor: pointer;
+    }
+
+    .toolbar button:hover { background: #096662; }
+    .toolbar .secondary { background: #52616a; }
+    .toolbar .secondary:hover { background: #39474e; }
+    .toolbar button:focus-visible { outline: 3px solid #6ab8b0; outline-offset: 2px; }
+
+    .page {
+      position: relative;
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto 18px;
+      padding: 12mm 17mm 17mm;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 7px 28px #152b3b20;
+    }
+
+    .letterhead {
+      display: grid;
+      grid-template-columns: 58% 42%;
+      min-height: 31mm;
+      align-items: start;
+    }
+
+    .logo {
+      display: block;
+      width: 157px;
+      max-width: 100%;
+      height: auto;
+      margin-top: 1mm;
+    }
+
+    .company-contact {
+      min-height: 31mm;
+      padding: 1mm 0 1mm 3mm;
+      border-left: 2px solid #62aee1;
+      color: #2b3c4d;
+      font: 7pt/1.26 Arial, Helvetica, sans-serif;
+    }
+
+    .company-contact p { margin: 0 0 1px; }
+    .company-contact strong { color: #176ea8; }
+    .company-contact a { color: inherit; text-decoration: none; }
+
+    .doc-title {
+      margin: 2mm 0 3mm;
+      padding-bottom: 2mm;
+      border-bottom: 1px solid var(--line);
+      text-align: center;
+      font-size: 9pt;
+      font-weight: 700;
+      letter-spacing: .04em;
+    }
+
+    .reference-line {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 3mm;
+      margin: 0 0 5mm;
+      font-size: 8.5pt;
+    }
+
+    .reference-line label { display: flex; align-items: baseline; gap: 3px; }
+
+    input, textarea {
+      min-width: 0;
+      padding: 0 1px;
+      border: 0;
+      border-bottom: 1px dotted transparent;
+      border-radius: 0;
+      outline: 0;
+      color: inherit;
+      background: transparent;
+      font: inherit;
+    }
+
+    input:hover, textarea:hover { border-bottom-color: #b7c3ca; }
+    input:focus, textarea:focus { border-bottom-color: var(--blue); background: #fffbe8; }
+    input::placeholder, textarea::placeholder { color: #8b8b8b; opacity: 1; }
+
+    .reference { width: 65mm; font-weight: 700; }
+    .date { width: 39mm; }
+
+    .recipient {
+      margin-bottom: 3mm;
+      font-size: 9pt;
+      line-height: 1.32;
+    }
+
+    .recipient p { margin: 0 0 1px; }
+    .recipient .customer { width: 90mm; font-weight: 700; }
+    .recipient .address { width: 82mm; }
+    .recipient .attention { width: 76mm; }
+    .recipient .phone { width: 53mm; }
+    .recipient .email { width: 84mm; }
+
+    .salutation { margin: 0 0 3mm; }
+    .intro { margin: 0 0 3mm; line-height: 1.28; }
+
+    .product { margin: 0 0 3mm; }
+    .product-title {
+      margin: 0 0 1.3mm;
+      font-size: 8.8pt;
+      line-height: 1.2;
+      text-align: center;
+      text-decoration: underline;
+      text-transform: uppercase;
+    }
+
+    .spec-list {
+      display: grid;
+      grid-template-columns: 47mm 4mm minmax(0, 1fr);
+      column-gap: 1mm;
+      row-gap: .35mm;
+      margin: 0;
+      font-size: 8.2pt;
+      line-height: 1.18;
+    }
+
+    .spec-list dt { margin: 0; font-weight: 700; }
+    .spec-list dd { min-width: 0; margin: 0; }
+    .spec-list .separator { text-align: center; }
+    .spec-list input { width: 100%; }
+    .spec-list .short-value { width: 70mm; max-width: 100%; }
+
+    .material-table {
+      width: 80mm;
+      margin: 1.2mm 0 1mm 49mm;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 8pt;
+      line-height: 1.14;
+    }
+
+    .material-table th, .material-table td {
+      padding: .2mm 1mm;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .material-table th { text-decoration: underline; }
+    .material-table th:first-child, .material-table td:first-child { width: 57mm; }
+    .material-table input { width: 100%; }
+
+    .price-list {
+      display: grid;
+      grid-template-columns: 24mm 4mm minmax(0, 1fr);
+      column-gap: 1mm;
+      row-gap: .3mm;
+      margin-top: 1.2mm;
+      font-size: 8.1pt;
+      line-height: 1.17;
+    }
+
+    .price-list dt { margin: 0; font-weight: 700; }
+    .price-list dd { min-width: 0; margin: 0; }
+    .price-list .separator { text-align: center; }
+    .price-list input { width: 100%; }
+
+    .continuation-heading {
+      margin: 0 0 1.5mm 49mm;
+      font-size: 8pt;
+      text-decoration: underline;
+    }
+
+    .technical-note {
+      margin: 4mm 0 6mm;
+      text-align: center;
+      font-size: 8.5pt;
+      font-weight: 700;
+      font-style: italic;
+    }
+
+    .terms-heading {
+      margin: 0 0 1mm;
+      font-size: 8.5pt;
+      text-decoration: underline;
+    }
+
+    .terms {
+      display: grid;
+      grid-template-columns: 24mm 4mm minmax(0, 1fr);
+      column-gap: 1mm;
+      row-gap: .7mm;
+      margin: 0 0 5mm;
+      font-size: 8pt;
+      line-height: 1.2;
+    }
+
+    .terms dt { margin: 0; font-weight: 700; }
+    .terms dd { min-width: 0; margin: 0; }
+    .terms .separator { text-align: center; }
+    .terms input, .terms textarea { width: 100%; }
+    .terms textarea { min-height: 9mm; resize: vertical; }
+
+    .closing { margin: 0 0 3mm; line-height: 1.28; }
+    .signoff { margin-top: 5mm; line-height: 1.3; }
+    .signoff p { margin: 0 0 2mm; }
+    .signature-space { height: 7mm; }
+    .editable-text { width: 100%; }
+
+    .corner-accent {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 21mm;
+      height: 17mm;
+      background: linear-gradient(140deg, transparent 0 49%, #57a9d8 50% 55%, #302c70 56% 100%);
+      clip-path: polygon(100% 0, 100% 100%, 0 100%);
+    }
+
+    .page-number {
+      position: absolute;
+      right: 17mm;
+      bottom: 7mm;
+      color: #707070;
+      font: 7pt Arial, Helvetica, sans-serif;
+    }
+
+    @page { size: A4; margin: 0; }
+
+    @media print {
+      body { padding: 0; background: #fff; }
+      .toolbar { display: none !important; }
+      .page {
+        width: 210mm;
+        height: 297mm;
+        min-height: 297mm;
+        margin: 0;
+        padding: 12mm 17mm 17mm;
+        overflow: hidden;
+        box-shadow: none;
+        break-after: page;
+        page-break-after: always;
+      }
+      .page:last-of-type { break-after: auto; page-break-after: auto; }
+      input, textarea { border-color: transparent !important; }
+      input:focus, textarea:focus { background: transparent; }
+      input::placeholder, textarea::placeholder { color: transparent; }
+    }
+
+    @media (max-width: 760px) {
+      body { padding: 10px; }
+      .toolbar { width: 100%; justify-content: center; flex-wrap: wrap; }
+      .page { width: 100%; min-height: 0; padding: 28px 22px 48px; }
+      .letterhead { grid-template-columns: 53% 47%; }
+      .reference { width: min(65mm, 64vw); }
+      .recipient .customer, .recipient .address,
+      .recipient .attention, .recipient .email { max-width: 72vw; }
+      .spec-list { grid-template-columns: minmax(125px, 38%) 10px minmax(0, 1fr); }
+      .material-table { width: min(80mm, 100%); margin-left: 38%; }
+      .continuation-heading { margin-left: 38%; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="toolbar" aria-label="Quotation actions">
+    <button class="secondary" type="button" onclick="window.location.href='Mainpage.html'">Back to portal</button>
+    <button class="secondary" type="button" onclick="resetQuotation()">Reset quotation</button>
+    <button type="button" onclick="window.print()">Print / Save as PDF</button>
+  </nav>
+
+  <main aria-label="Editable quotation">
+    <section class="page" aria-label="Quotation page 1">
+      <header class="letterhead">
+        <div><img class="logo" src="img/logo_color.png" alt="Water Innovation Systems"></div>
+        <div class="company-contact">
+          <p><strong>Mahadeva Arcade</strong>, 3rd Floor, Best County</p>
+          <p>Hesaraghatta Main Road, Vidyaranyapura Post</p>
+          <p>Bangalore - 560 097</p>
+          <p>Tel: 080-XXXXXXX / 9900XXXXXX</p>
+          <p><a href="mailto:sales@waterinnovation.co.in">sales@waterinnovation.co.in</a></p>
+          <p><a href="https://www.waterinnovation.co.in">www.waterinnovation.co.in</a></p>
+          <p>GSTIN: <input aria-label="Company GSTIN" placeholder="Enter GSTIN" style="width:29mm"> &nbsp; PAN: <input aria-label="Company PAN" placeholder="Enter PAN" style="width:20mm"></p>
+        </div>
+      </header>
+
+      <h1 class="doc-title">QUOTATION</h1>
+      <div class="reference-line">
+        <label><strong>Ref:</strong><input class="reference" aria-label="Quotation reference number" value="WIS/OT/2020-21/04-Rev0"></label>
+        <label><strong>Date:</strong><input class="date" aria-label="Quotation date" value="October 29th 2020"></label>
+      </div>
+
+      <section class="recipient" aria-label="Customer details">
+        <p><strong>M/s.</strong> <input class="customer" aria-label="Customer company" value="Vashi Integrated Solutions Limited"></p>
+        <p><input class="address" aria-label="Customer address" value="Chamarajpet, Bangalore"></p>
+        <p><strong>Kind Attn:</strong> <input class="attention" aria-label="Customer contact person" value="Mr. Sachin P.K"></p>
+        <p><strong>Mobile:</strong> <input class="phone" type="tel" aria-label="Customer mobile number" value="9113559561"></p>
+        <p><strong>E-mail ID:</strong> <input class="email" type="email" aria-label="Customer email address" value="sachin.pk@vashi.co.in"></p>
+      </section>
+
+      <p class="salutation">Dear Sir,</p>
+      <p class="intro">We acknowledge with thanks the receipt of your mail enquiry and in this connection, we take pleasure to give below our offer against your requirement for Milton Roy Make Dosing Pumps.</p>
+
+      <section class="product" aria-labelledby="pumpOneTitle">
+        <h2 class="product-title" id="pumpOneTitle">1. &nbsp; MECHANICALLY ACTUATED DIAPHRAGM METERING PUMP</h2>
+        <dl class="spec-list">
+          <dt>Make</dt><span class="separator">:</span><dd><input aria-label="Pump 1 make" value="MILTON ROY"></dd>
+          <dt>Model</dt><span class="separator">:</span><dd><input aria-label="Pump 1 model" value="G5-043"></dd>
+          <dt>Maximum Capacity</dt><span class="separator">:</span><dd><input aria-label="Pump 1 maximum capacity" value="320 L/H"></dd>
+          <dt>Maximum Pressure</dt><span class="separator">:</span><dd><input aria-label="Pump 1 maximum pressure" value="5 KG/CM2"></dd>
+          <dt>Stroke Speed</dt><span class="separator">:</span><dd><input aria-label="Pump 1 stroke speed" value="144 SPM"></dd>
+          <dt>Stroke Length</dt><span class="separator">:</span><dd><input aria-label="Pump 1 stroke length" value="12 mm"></dd>
+          <dt>End Connections (Suction &amp; Discharge)</dt><span class="separator">:</span><dd><input aria-label="Pump 1 end connections" value="1/2&quot; BSP(F)"></dd>
+          <dt>MOC</dt><span class="separator">:</span><dd><input aria-label="Pump 1 material of construction" value="PP"></dd>
+        </dl>
+        <table class="material-table" aria-label="Pump 1 components and materials">
+          <thead><tr><th>Components</th><th>Materials</th></tr></thead>
+          <tbody>
+            <tr><td><input aria-label="Pump 1 component 1" value="Liquid end Body"></td><td><input aria-label="Pump 1 material 1" value="PP"></td></tr>
+            <tr><td><input aria-label="Pump 1 component 2" value="Valve Body"></td><td><input aria-label="Pump 1 material 2" value="PVC"></td></tr>
+            <tr><td><input aria-label="Pump 1 component 3" value="Seats"></td><td><input aria-label="Pump 1 material 3" value="PVC"></td></tr>
+            <tr><td><input aria-label="Pump 1 component 4" value="Balls"></td><td><input aria-label="Pump 1 material 4" value="PVC"></td></tr>
+            <tr><td><input aria-label="Pump 1 component 5" value="Connections"></td><td><input aria-label="Pump 1 material 5" value="PVC"></td></tr>
+            <tr><td><input aria-label="Pump 1 component 6" value="Diaphragm"></td><td><input aria-label="Pump 1 material 6" value="Gylon"></td></tr>
+            <tr><td><input aria-label="Pump 1 component 7" value="PRV"></td><td><input aria-label="Pump 1 material 7" value="PVC"></td></tr>
+            <tr><td><input aria-label="Pump 1 component 8" value="Y-Strainer"></td><td><input aria-label="Pump 1 material 8" value="PP"></td></tr>
+            <tr><td><input aria-label="Pump 1 component 9" value="Antisiphon Valve"></td><td><input aria-label="Pump 1 material 9" value="PP"></td></tr>
+          </tbody>
+        </table>
+        <dl class="price-list">
+          <dt>Price Data</dt><span class="separator">:</span><dd><input aria-label="Pump 1 price description" value="03 Nos. G5-043, 415V, 1440rpm, 50Hz, 3phase, IP55"></dd>
+          <dt>Qty</dt><span class="separator">:</span><dd><input aria-label="Pump 1 quantity" value="03 Nos"></dd>
+          <dt>Unit Price</dt><span class="separator">:</span><dd><input aria-label="Pump 1 unit price" value="Rs. 64,074/- Each"></dd>
+          <dt>Total Price</dt><span class="separator">:</span><dd><input aria-label="Pump 1 total price" value="Rs. 1,92,222.00"></dd>
+        </dl>
+      </section>
+
+      <section class="product" aria-labelledby="pumpTwoTitle">
+        <h2 class="product-title" id="pumpTwoTitle">2. &nbsp; ELECTRO MAGNETICALLY ACTUATED DIAPHRAGM METERING PUMP</h2>
+        <dl class="spec-list">
+          <dt>Make</dt><span class="separator">:</span><dd><input aria-label="Pump 2 make" value="MILTON ROY"></dd>
+          <dt>Model</dt><span class="separator">:</span><dd><input aria-label="Pump 2 model" value="P14"></dd>
+          <dt>Minimum Capacity</dt><span class="separator">:</span><dd><input aria-label="Pump 2 minimum capacity" value="0.0 L/H"></dd>
+          <dt>Maximum Capacity</dt><span class="separator">:</span><dd><input aria-label="Pump 2 maximum capacity" value="90 L/H"></dd>
+          <dt>Maximum Pressure</dt><span class="separator">:</span><dd><input aria-label="Pump 2 maximum pressure" value="1.5 KG/CM2"></dd>
+          <dt>Size of Tubing (Suction &amp; Discharge)</dt><span class="separator">:</span><dd><input aria-label="Pump 2 tubing size" value="1/2&quot; ID"></dd>
+          <dt>MOC</dt><span class="separator">:</span><dd><input aria-label="Pump 2 material of construction" value="PP"></dd>
+        </dl>
+        <table class="material-table" aria-label="Pump 2 components and materials">
+          <thead><tr><th>Components</th><th>Materials</th></tr></thead>
+          <tbody>
+            <tr><td><input aria-label="Pump 2 component 1" value="Liquid end Body"></td><td><input aria-label="Pump 2 material 1" value="PP"></td></tr>
+            <tr><td><input aria-label="Pump 2 component 2" value="Valve Body"></td><td><input aria-label="Pump 2 material 2" value="PVC"></td></tr>
+            <tr><td><input aria-label="Pump 2 component 3" value="Ring Seal"></td><td><input aria-label="Pump 2 material 3" value="TEFLON"></td></tr>
+          </tbody>
+        </table>
+      </section>
+      <span class="page-number" aria-hidden="true">1</span>
+      <div class="corner-accent" aria-hidden="true"></div>
+    </section>
+
+    <section class="page" aria-label="Quotation page 2">
+      <h2 class="continuation-heading">Components <span style="float:right; width:23mm">Materials</span></h2>
+      <table class="material-table" aria-label="Continuation of pump 2 components and materials">
+        <tbody>
+          <tr><td><input aria-label="Pump 2 component 4" value="Balls"></td><td><input aria-label="Pump 2 material 4" value="CERAMIC"></td></tr>
+          <tr><td><input aria-label="Pump 2 component 5" value="Connections"></td><td><input aria-label="Pump 2 material 5" value="PVC"></td></tr>
+          <tr><td><input aria-label="Pump 2 component 6" value="Diaphragm"></td><td><input aria-label="Pump 2 material 6" value="TEFLON FACED HYALON"></td></tr>
+          <tr><td><input aria-label="Pump 2 component 7" value="Foot Valve"></td><td><input aria-label="Pump 2 material 7" value="PVC"></td></tr>
+          <tr><td><input aria-label="Pump 2 component 8" value="Antisiphon Valve"></td><td><input aria-label="Pump 2 material 8" value="PVC"></td></tr>
+          <tr><td><input aria-label="Pump 2 component 9" value="Tubing"></td><td><input aria-label="Pump 2 material 9" value="LDPE"></td></tr>
+        </tbody>
+      </table>
+
+      <dl class="price-list">
+        <dt>Price Data</dt><span class="separator">:</span><dd><input aria-label="Pump 2 price description" value="Electromagnetic Power Unit (EPU) 230V, 50Hz"></dd>
+        <dt></dt><span class="separator"></span><dd><input aria-label="Pump 2 power details" value="Single Phase A.C, Power Consumption 3Amp, 100 Watts."></dd>
+        <dt>Qty</dt><span class="separator">:</span><dd><input aria-label="Pump 2 quantity" value="03 Nos"></dd>
+        <dt>Unit Price</dt><span class="separator">:</span><dd><input aria-label="Pump 2 unit price" value="Rs. 53,050/- Each"></dd>
+        <dt>Total Price</dt><span class="separator">:</span><dd><input aria-label="Pump 2 total price" value="Rs. 1,59,150.00"></dd>
+      </dl>
+
+      <p class="technical-note">(Technical Specification Enclosed)</p>
+      <h2 class="terms-heading">Terms and Conditions</h2>
+      <dl class="terms">
+        <dt>Prices</dt><span class="separator">:</span><dd><input aria-label="Price terms" value="Ex-Works Bangalore"></dd>
+        <dt>HSN Code</dt><span class="separator">:</span><dd><input aria-label="HSN code" value="84135010"></dd>
+        <dt>Sales Tax</dt><span class="separator">:</span><dd><input aria-label="Tax terms" value="GST @ 18% Extra"></dd>
+        <dt>Payment</dt><span class="separator">:</span><dd><input aria-label="Payment terms" value="100% Against Proforma Invoice Prior to dispatch"></dd>
+        <dt>Delivery</dt><span class="separator">:</span><dd><textarea aria-label="Delivery terms">Ex-stock subject to the prior sale or 4-6 Weeks from the date of receipt of your confirmed purchase order</textarea></dd>
+        <dt>Freight</dt><span class="separator">:</span><dd><input aria-label="Freight terms" value="Extra to your account"></dd>
+        <dt>P&amp;F</dt><span class="separator">:</span><dd><input aria-label="Packing and forwarding terms" value="3%, Insurance to your account"></dd>
+        <dt>Warranty</dt><span class="separator">:</span><dd><textarea aria-label="Warranty terms">Dosing Pump is warranted against manufacturing defects for a period of 18 months from the date of dispatch or 12 months from the date of commissioning whichever is earlier.</textarea></dd>
+      </dl>
+
+      <p class="closing">We hope you will find our offer most competitive, terms attractive and in line with your requirement.</p>
+      <p class="closing">In case you require any additional information or clarification, ideally feel free to contact us.<br>For any technical clarifications, kindly contact Mr. Blaise: <input aria-label="Technical contact number" type="tel" value="9990204599" style="width:27mm"></p>
+      <p class="closing">Thanking you and looking forward to receiving your valued orders and assuring you of our best and prompt attention at all times.</p>
+
+      <div class="signoff">
+        <p>Yours faithfully<br><strong>For Water Innovation Systems</strong></p>
+        <div class="signature-space" aria-hidden="true"></div>
+        <p><strong>M/s. -</strong> <input class="editable-text" aria-label="Authorized signatory name" placeholder="Authorized signatory"></p>
+      </div>
+      <span class="page-number" aria-hidden="true">2</span>
+      <div class="corner-accent" aria-hidden="true"></div>
+    </section>
+  </main>
+
+  <script>
+    function resetQuotation() {
+      if (window.confirm("Reset all quotation fields to the reference values?")) {
+        window.location.reload();
+      }
+    }
+  </script>
+</body>
+</html>
