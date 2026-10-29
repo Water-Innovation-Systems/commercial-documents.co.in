@@ -26,3 +26,13 @@ Generate customized documents with company details, customer information, produc
 - Print-ready layouts and PDF export.
 - Organized commercial records for easy reference.
 - Improved accuracy, efficiency, and consistency across business transactions.
+
+## Sign-in integration
+
+`index.html` loads `login.js`, which posts account requests to these same-origin HTTPS endpoints:
+
+- `POST /api/auth/signup` accepts `{ name, company, email, password, acceptTerms }`. Return `{"created":true}` after the account is securely created, or `{"authenticated":true}` if signup also creates a session.
+- `POST /api/auth/login` accepts `{ email, password, remember }`. Return `{"authenticated":true}` only after verifying the password and establishing a session.
+- `POST /api/auth/password-reset` accepts `{ email }`. Return `{"accepted":true}` and send reset instructions through the server.
+
+The browser never saves passwords. Implement these endpoints on the server: hash passwords with Argon2id or bcrypt, issue `Secure`, `HttpOnly`, `SameSite` session cookies, validate requests and terms server-side, rate-limit authentication attempts, and protect the document pages and APIs by checking the session. The standalone HTML files do not provide server-side authentication or access control; run the site over HTTPS, not by opening `index.html` as a local file.
