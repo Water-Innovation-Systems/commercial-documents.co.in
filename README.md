@@ -27,12 +27,40 @@ Generate customized documents with company details, customer information, produc
 - Organized commercial records for easy reference.
 - Improved accuracy, efficiency, and consistency across business transactions.
 
-## Sign-in integration
+## Run the signup and login portal
 
-`index.html` loads `login.js`, which posts account requests to these same-origin HTTPS endpoints:
+The authentication API and static website are served together so sign-in works
+on the same origin. From this folder, run:
 
-- `POST /api/auth/signup` accepts `{ name, company, email, password, acceptTerms }`. Return `{"created":true}` after the account is securely created, or `{"authenticated":true}` if signup also creates a session.
-- `POST /api/auth/login` accepts `{ email, password, remember }`. Return `{"authenticated":true}` only after verifying the password and establishing a session.
-- `POST /api/auth/password-reset` accepts `{ email }`. Return `{"accepted":true}` and send reset instructions through the server.
+```powershell
+python auth_server.py
+```
 
-The browser never saves passwords. Implement these endpoints on the server: hash passwords with Argon2id or bcrypt, issue `Secure`, `HttpOnly`, `SameSite` session cookies, validate requests and terms server-side, rate-limit authentication attempts, and protect the document pages and APIs by checking the session. The standalone HTML files do not provide server-side authentication or access control; run the site over HTTPS, not by opening `index.html` as a local file.
+Open `http://127.0.0.1:8000/index.html` in your browser. **Do not open
+`index.html` as a `file://` URL.** New accounts are saved to a local SQLite
+database, and successfully signing up or signing in redirects to
+`Mainpage.html`. The dashboard and document pages redirect unauthenticated
+visitors to the sign-in page. The “Keep me signed in” checkbox controls session
+duration.
+
+On Windows, the default account database is stored outside the repository at
+`%LOCALAPPDATA%\WaterInnovationSystems\accounts.sqlite3`. To select a different
+database for local testing, set `WIS_AUTH_DB` before starting the server.
+Accounts persist when the server restarts; password hashes, never plaintext
+passwords, are stored in the database.
+
+`login.js` sends same-origin requests to the server's signup, login and
+password-reset endpoints. Signup and login are implemented. Password reset
+returns a clear “email delivery is not configured” error until an email
+provider is set up.
+
+For production, deploy behind a properly configured HTTPS application server
+and reverse proxy, set `WIS_COOKIE_SECURE=1`, and review the session, database
+backup, and rate-limiting configuration. Python's built-in development server
+is intended for local use, not direct public deployment.
+
+Run the authentication tests with:
+
+```powershell
+python -m unittest -v test_auth_server.py
+```
