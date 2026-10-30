@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Commercial Documents</string>
+    <string name="print_job_name">Commercial document</string>
+    <string name="no_browser_available">No browser is available to open this link.</string>
+    <string name="page_load_error">Could not load the app page. Close and reopen the app.</string>
+    <string name="print_unavailable">Could not open printing: %1$s</string>
+    <string name="download_started">Your download was added to Downloads.</string>
+    <string name="download_unavailable">This download link is invalid or unavailable.</string>
+    <string name="download_permission_denied">Storage permission was denied. The download was not started.</string>
+    <string name="file_picker_unavailable">No file picker is available on this device.</string>
+</resources>
