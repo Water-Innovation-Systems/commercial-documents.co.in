@@ -41,3 +41,24 @@ files are still publicly accessible. Do not use it to protect commercial or
 personal information. Use a server-side authentication service with a database
 and sessions before deploying a production portal. Browser-only password resets
 are not available.
+
+## Android app
+
+Open `android-app` in Android Studio and install Android SDK 35. The project
+wrapper pins Gradle 8.13, compatible with Android Gradle Plugin 8.13.2; use
+`gradlew.bat assembleDebug` on Windows to build
+`app/build/outputs/apk/debug/app-debug.apk`, or run the `app` configuration on
+an Android 6.0 (API 23) or newer device. The app opens the published website
+and requires an internet connection. Downloads are saved to the device's
+Downloads folder; the legacy external-storage permission is requested only
+on Android 9 and earlier. File uploads use Android's system picker without
+broad media-storage permissions. Document print buttons open Android's print
+dialog, where a PDF can be saved. Sign-up and workspace data are stored locally
+on the device; the authentication limitations above apply to the Android app
+as well. The Android launcher icon uses the supplied Water Innovation Systems
+logo with adaptive-icon support and density-specific icons for older Android
+versions.
+
+The Android app packages the website as it currently exists. Quotation and
+purchase-order pages have document forms; other dashboard entries are not yet
+implemented in the website, and `tax-invoice.html` is currently empty.
